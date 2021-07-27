@@ -1,7 +1,7 @@
 class MovieModel {
   bool? adult;
   String? backdropPath;
-  List<int>? genreIds;
+  List<dynamic>? genreIds;
   int? id;
   String? originalLanguage;
   String? originalTitle;
@@ -34,17 +34,19 @@ class MovieModel {
   factory MovieModel.fromJson(Map<String, dynamic> json) => MovieModel(
         adult: json['adult'] as bool?,
         backdropPath: json['backdrop_path'] as String?,
-        genreIds: json['genre_ids'] as List<int>?,
+        genreIds: json['genre_ids'] as List<dynamic>?,
         id: json['id'] as int?,
         originalLanguage: json['original_language'] as String?,
         originalTitle: json['original_title'] as String?,
         overview: json['overview'] as String?,
-        popularity: json['popularity'] as double?,
+        popularity: json['popularity'],
         posterPath: json['poster_path'] as String?,
         releaseDate: json['release_date'] as String?,
         title: json['title'] as String?,
         video: json['video'] as bool?,
-        voteAverage: json['vote_average'] as double?,
+        voteAverage: json['vote_average'].runtimeType == int
+            ? (json['vote_average']).toDouble()
+            : json['vote_average'],
         voteCount: json['vote_count'] as int?,
       );
 

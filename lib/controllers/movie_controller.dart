@@ -2,13 +2,12 @@ import 'package:troca_conhecimento/models/movie_model.dart';
 import 'package:troca_conhecimento/repositories/movie_repository.dart';
 
 class MovieController {
-  final MovieRepository repository;
+  MovieRepository repository = MovieRepository();
+  List<MovieModel> moviesList = [];
 
-  MovieController(this.repository);
-
-  Future<List<MovieModel>> getMostPopularMovies() async {
+  Future<void> getMostPopularMovies() async {
     try {
-      return await repository.getMostPopularMovies();
+      moviesList = await repository.getMostPopularMovies();
     } catch (e) {
       throw e;
     }

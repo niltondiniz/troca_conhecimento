@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:troca_conhecimento/models/movie_model.dart';
+import 'package:troca_conhecimento/constants/tmdb_endpoints.dart';
+import 'package:troca_conhecimento/controllers/movie_controller.dart';
+import 'package:troca_conhecimento/pages/detail_page.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -10,25 +13,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final moviesList = [
-    MovieModel.fromJson({
-      "adult": false,
-      "backdrop_path": "/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
-      "genre_ids": [28, 14, 12],
-      "id": 460465,
-      "original_language": "en",
-      "original_title": "Mortal Kombat",
-      "overview":
-          "Nova aventura baseada no videogame Mortal Kombat. Na história, um jovem que nunca treinou artes marciais acaba envolvido em um gigantesco torneio de luta envolvendo guerreiros da Terra e lutadores e outras dimensões.",
-      "popularity": 1028.395,
-      "poster_path": "/ijvC2w2yANsfgLT3LMu2zFr0fxh.jpg",
-      "release_date": "2021-04-07",
-      "title": "Mortal Kombat",
-      "video": false,
-      "vote_average": 7.5,
-      "vote_count": 3364
-    })
-  ];
+  final controller = MovieController();
+
+  @override
+  void initState() {
+    super.initState();
+    initMovieList();
+  }
+
+  Future<void> initMovieList() async {
+    await controller.getMostPopularMovies();
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +34,151 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
+        color: Colors.black,
         child: ListView.builder(
-            itemCount: moviesList.length,
+            itemCount: controller.moviesList.length,
             itemBuilder: (BuildContext context, int index) {
-              return 
+              return GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Container(
+                      height: 200,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3)),
+                              child: Hero(
+                                tag: controller.moviesList[index].id!,
+                                child: CachedNetworkImage(
+                                  imageUrl: TmdbEndpoints.imageUrlBase +
+                                      controller.moviesList[index].posterPath!,
+                                  placeholder: (context, url) => SizedBox(
+                                    width: 200,
+                                    height: 100,
+                                    child: CircularProgressIndicator.adaptive(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              padding: EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    controller.moviesList[index].title!,
+                                    style:
+                                        Theme.of(context).textTheme.headline1,
+                                  ),
+                                  Text(
+                                    controller.moviesList[index].originalTitle!,
+                                    style:
+                                        Theme.of(context).textTheme.subtitle1,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "Popularity: ",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
+                                      ),
+                                      Text(
+                                        controller.moviesList[index].popularity!
+                                            .round()
+                                            .toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Votos: ",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1,
+                                          ),
+                                          Text(
+                                            controller
+                                                .moviesList[index].voteCount!
+                                                .round()
+                                                .toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Média: ",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1,
+                                          ),
+                                          Text(
+                                            controller
+                                                .moviesList[index].voteAverage!
+                                                .round()
+                                                .toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  Text(
+                                    controller.moviesList[index].overview!,
+                                    style:
+                                        Theme.of(context).textTheme.subtitle2,
+                                    maxLines: 4,
+                                    overflow: TextOverflow.fade,
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(
+                          movie: controller.moviesList[index],
+                        ),
+                      ),
+                    );
+                  });
             }),
       ),
     );

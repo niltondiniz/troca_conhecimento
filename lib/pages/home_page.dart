@@ -84,6 +84,9 @@ class _HomePageState extends State<HomePage> {
                               child: CachedNetworkImage(
                                 imageUrl:
                                     "$tmdbImageEndpoint${movieList[index]['poster_path']}",
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
                             ),
                           ),

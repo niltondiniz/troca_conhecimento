@@ -1,11 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:troca_conhecimento/constants/tmdb_endpoints.dart';
-import 'package:troca_conhecimento/models/movie_model.dart';
+import 'package:flutter/rendering.dart';
 
 class DetailPage extends StatefulWidget {
-  final MovieModel movie;
+  final Map<String, dynamic> movie;
   const DetailPage({Key? key, required this.movie}) : super(key: key);
 
   @override
@@ -13,6 +11,8 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final String tmdbImageEndpoint = "https://image.tmdb.org/t/p/w500";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,14 +20,12 @@ class _DetailPageState extends State<DetailPage> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           image: DecorationImage(
+            image: Image.network(
+              tmdbImageEndpoint + widget.movie['poster_path'],
+            ).image,
             fit: BoxFit.fitHeight,
-            colorFilter: new ColorFilter.mode(
-              Colors.black.withOpacity(0.2),
-              BlendMode.dstIn,
-            ),
-            image: new NetworkImage(
-              TmdbEndpoints.imageUrlBase + widget.movie.posterPath!,
-            ),
+            colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.3), BlendMode.dstIn),
           ),
         ),
         child: Stack(
@@ -59,10 +57,10 @@ class _DetailPageState extends State<DetailPage> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.3,
                         child: Hero(
-                          tag: widget.movie.id!,
+                          tag: widget.movie['id']!,
                           child: CachedNetworkImage(
-                            imageUrl: TmdbEndpoints.imageUrlBase +
-                                widget.movie.posterPath!,
+                            imageUrl: tmdbImageEndpoint +
+                                widget.movie['poster_path']!,
                           ),
                         ),
                       ),
@@ -70,11 +68,11 @@ class _DetailPageState extends State<DetailPage> {
                         height: 16,
                       ),
                       Text(
-                        widget.movie.title!,
+                        widget.movie['title']!,
                         style: Theme.of(context).textTheme.headline1,
                       ),
                       Text(
-                        widget.movie.originalTitle!,
+                        widget.movie['original_title']!,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       SizedBox(
@@ -85,7 +83,7 @@ class _DetailPageState extends State<DetailPage> {
                         style: Theme.of(context).textTheme.headline2,
                       ),
                       Text(
-                        widget.movie.overview!,
+                        widget.movie['overview']!,
                         style: Theme.of(context).textTheme.subtitle2,
                       ),
                     ],
@@ -96,10 +94,10 @@ class _DetailPageState extends State<DetailPage> {
             Positioned(
               top: 50,
               child: IconButton(
-                icon: Icon(Icons.arrow_back),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                 },
+                icon: Icon(Icons.arrow_back),
               ),
             ),
           ],
